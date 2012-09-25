@@ -1,4 +1,3 @@
-
 tree.classify = function(x, tr) {
 
 }
@@ -6,8 +5,6 @@ tree.classify = function(x, tr) {
 tree.grow = function(x, y, nmin, minleaf) {
 
 }
-
-
 
 tree.impurity = function (v) {
   sum(v) / length(v) * (length(v) - sum(v)) / length(v)

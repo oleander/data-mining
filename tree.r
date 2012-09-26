@@ -7,7 +7,7 @@ tree.grow = function(x, y, nmin, minleaf) {
 }
 
 tree.impurity = function (v) {
-  sum(v) / length(v) * (length(v) - sum(v)) / length(v)
+  (sum(v) / length(v)) * (length(v) - sum(v)) / length(v)
 }
 
 tree.bestsplit = function (x, y) {
@@ -28,12 +28,12 @@ tree.bestsplit = function (x, y) {
     piLeft <- length(left)/length(x_)
     piRight <- length(right)/length(x_)
 
-    currentR = impurity(x) - (piLeft*impurity(left) + piRight*impurity(right))
+    currentR = tree.impurity(y) - (piLeft*tree.impurity(left) + piRight*tree.impurity(right))
     if(currentR > bestR){
       bestR = currentR
       bestS = a
     }
   }
 
-  return(bestS)
+  return(c(bestS, bestR))
 }

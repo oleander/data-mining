@@ -8,13 +8,13 @@ tree.classify = function(person, tr) {
 
 tree.calcClassify = function(person, tr) {
   if(tree.isNode(tr)){
-    index = tr[1]
+    index = tr[[1]][[1]]
     comp = person[index]
 
     if(comp <= person[2]){
-      return(tree.calcClassify(person, tr[3]))
+      return(tree.calcClassify(person, tr[[3]]))
     } else {
-      return(tree.calcClassify(person, tr[4]))
+      return(tree.calcClassify(person, tr[[4]]))
     }
   } else if(tree.isLeaf(tr)){
     return(tr)

@@ -2,13 +2,8 @@
 # @xs Array<Array<Integer>>
 # @tr A custom tree
 #
-tree.classify = function(xs, tr) {
-  classes = c()
-  for (i in 1:nrow(xs)) {
-    classes[i] = tree.calcClassify(xs[i], tr)
-  }
-
-  return(classes)
+tree.classify = function(person, tr) {
+  tree.calcClassify(person, tr)
 }
 
 tree.calcClassify = function(person, tr) {
@@ -29,7 +24,7 @@ tree.calcClassify = function(person, tr) {
 }
 
 tree.isNode = function(tr) {
-  return(ncol(tr) == 4)
+  return(length(tr) == 4)
 }
 
 tree.isLeaf = function(tr) {

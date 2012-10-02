@@ -1,5 +1,39 @@
-tree.classify = function(x, tr) {
+#
+# @xs Array<Array<Integer>>
+# @tr A custom tree
+#
+tree.classify = function(xs, tr) {
+  classes = c()
+  for (i in 1:nrow(xs)) {
+    classes[i] = tree.calcClassify(xs[i], tr)
+  }
 
+  return(classes)
+}
+
+tree.calcClassify = function(person, tr) {
+  if(tree.isNode(tr)){
+    index = tr[1]
+    comp = person[index]
+
+    if(comp <= person[2]){
+      return(tree.calcClassify(person, tr[3]))
+    } else {
+      return(tree.calcClassify(person, tr[4]))
+    }
+  } else if(tree.isLeaf(tr)){
+    return(tr)
+  } else {
+    print("\n\nWTF")
+  }
+}
+
+tree.isNode = function(tr) {
+  return(ncol(tr) == 4)
+}
+
+tree.isLeaf = function(tr) {
+  return(class(tr) == "numeric")
 }
 
 tree.grow = function(matrix, class, nmin=2, minleaf=1) {
@@ -38,8 +72,8 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
 }
 
 tree.main = function() {
-  matrix = read.csv('pima.txt')
-  tree.grow(matrix[,1:8], matrix[,9])
+  matrix = read.csv('/Users/linus/data.txt')
+  tree.grow(matrix[,1:5], matrix[,6])
 }
 
 tree.impurity = function (v) {

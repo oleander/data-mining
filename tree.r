@@ -4,7 +4,7 @@ tree.classify = function(x, tr) {
 
 tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   if(nrow(matrix) < nmin){
-    return(-1)
+    return(tree.createLeaf(class))
   }
 
   bestR = -1
@@ -26,11 +26,12 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   rightClass = class[matrix[,bestI] > bestS]
 
   if(nrow(left) < minleaf || nrow(right) < minleaf) {
-    return(-1)
+    return(tree.createLeaf(class))
   }
 
   leftG = tree.grow(left, leftClass, nmin, minleaf)
   rightG = tree.grow(right, rightClass, nmin, minleaf)
+
   return(
     list(bestI, bestS, leftG, rightG)
   )
@@ -43,6 +44,10 @@ tree.main = function() {
 
 tree.impurity = function (v) {
   (sum(v) / length(v)) * (length(v) - sum(v)) / length(v)
+}
+
+tree.createLeaf = function(class) {
+  return(round((sum(class) / length(class)) + 0.01))
 }
 
 tree.bestsplit = function (x, y) {

@@ -2,21 +2,42 @@ tree.classify = function(x, tr) {
 
 }
 
-#
-# @x List<List> Matrix
-#
-tree.grow = function(x, y, nmin=2, minleaf=1) {
-  if(nrow(x) < nmin){
+tree.grow = function(matrix, class, nmin=2, minleaf=1) {
+  if(nrow(matrix) < nmin){
     return(-1)
   }
 
-  for (i in seq) {
-
+  bestR = -1
+  bestS = NULL
+  bestI = NULL
+  for (i in 1:ncol(matrix)) {
+    result = tree.bestsplit(matrix[,i], class)
+    if(result[2] > bestR) {
+      bestR = result[2]
+      bestS = result[1]
+      bestI = i
+    }
   }
+
+  left = matrix[matrix[,bestI] <= bestS,]
+  leftClass = class[matrix[,bestI] <= bestS]
+
+  right = matrix[matrix[,bestI] > bestS,]
+  rightClass = class[matrix[,bestI] > bestS]
+
+  if(nrow(left) < minleaf || nrow(right) < minleaf) {
+    return(-1)
+  }
+
+  leftG = tree.grow(left, leftClass, nmin, minleaf)
+  rightG = tree.grow(right, rightClass, nmin, minleaf)
+  return(
+    list(bestI, bestS, leftG, rightG)
+  )
 }
 
-tree.clean = function() {
-  matrix = read.csv('./pima.txt')
+tree.main = function() {
+  matrix = read.csv('pima.txt')
   tree.grow(matrix[,1:8], matrix[,9])
 }
 
@@ -29,9 +50,9 @@ tree.bestsplit = function (x, y) {
   y_ <- y[order(x)]
 
   bestR = -1
-  bestS = NULL  
+  bestS = 0 # "Should be" NULL
 
-  for (i in 1:  (length(x_) - 1))  {
+  for (i in 1:(length(x_) - 1))  {
     if (x_[i] == x_[i + 1]) {
       next
     }

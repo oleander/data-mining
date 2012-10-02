@@ -2,8 +2,22 @@ tree.classify = function(x, tr) {
 
 }
 
-tree.grow = function(x, y, nmin, minleaf) {
+#
+# @x List<List> Matrix
+#
+tree.grow = function(x, y, nmin=2, minleaf=1) {
+  if(nrow(x) < nmin){
+    return(-1)
+  }
 
+  for (i in seq) {
+
+  }
+}
+
+tree.clean = function() {
+  matrix = read.csv('./pima.txt')
+  tree.grow(matrix[,1:8], matrix[,9])
 }
 
 tree.impurity = function (v) {

@@ -2,19 +2,25 @@
 # @xs Array<Array<Integer>>
 # @tr A custom tree
 #
-tree.classify = function(person, tr) {
-  tree.calcClassify(person, tr)
+tree.classify = function(cases, tr) {
+  classes = c()
+  for (i in 1:(nrow(cases))) {
+    classes[i] = tree.calcClassify(cases[i,], tr)
+  }
+  return(classes)
 }
 
-tree.calcClassify = function(person, tr) {
+tree.calcClassify = function(case, tr) {
   if(tree.isNode(tr)){
     index = tr[[3]][[3]]
-    comp = person[index]
+    comp = case[index]
 
-    if(comp <= person[2]){
-      return(tree.calcClassify(person, tr[[5]]))
+    # Walk left
+    if(comp <= tr[[4]]){
+      return(tree.calcClassify(case, tr[[5]]))
+    # Walk right
     } else {
-      return(tree.calcClassify(person, tr[[6]]))
+      return(tree.calcClassify(case, tr[[6]]))
     }
   } else if(tree.isLeaf(tr)){
     return(tr)
@@ -83,7 +89,12 @@ tree.print = function(node, level = 0) {
 
 tree.main = function() {
   matrix = read.csv('credit.txt')
-  tree.grow(matrix[,1:5], matrix[,6])
+  small = tree.grow(matrix[,1:5], matrix[,6])
+
+  matrix = read.csv('pima.txt')
+  large = tree.grow(matrix[,1:8], matrix[,9])
+
+  return(c(small, large))
 }
 
 tree.impurity = function (v) {

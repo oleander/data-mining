@@ -69,3 +69,7 @@ dwsync.xml
 ###################
 *.komodoproject
 .komodotools
+
+.RData
+.Rapp.history
+.Rhistory

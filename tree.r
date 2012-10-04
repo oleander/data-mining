@@ -11,8 +11,10 @@ tree.calcClassify = function(person, tr) {
     index = tr[[1]][[1]]
     comp = person[index]
 
-    if(comp <= person[2]){
+    # Walk left
+    if(comp <= tr[[2]]){
       return(tree.calcClassify(person, tr[[3]]))
+    # Walk right
     } else {
       return(tree.calcClassify(person, tr[[4]]))
     }

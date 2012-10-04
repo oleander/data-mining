@@ -23,7 +23,11 @@ tree.calcClassify = function(case, tr) {
       return(tree.calcClassify(case, tr[[6]]))
     }
   } else if(tree.isLeaf(tr)){
-    return(tr)
+    if (tr[1] > tr[2]) {
+      return(0)
+    } else {
+      return(1)
+    }
   } else {
     print("\n\nWTF")
   }
@@ -41,7 +45,7 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   nClass0 = length(which(class == 0))
   nClass1 = length(which(class == 1))
   
-  if(nrow(matrix) < nmin){
+  if(nrow(matrix) < nmin || nClass0 == 0 || nClass1 == 0){
     return(list(nClass0, nClass1))
   }
 
@@ -91,6 +95,8 @@ tree.main = function() {
   matrix = read.csv('credit.txt')
   small = tree.grow(matrix[,1:5], matrix[,6])
 
+  return(small)
+
   matrix = read.csv('pima.txt')
   large = tree.grow(matrix[,1:8], matrix[,9])
 
@@ -99,10 +105,6 @@ tree.main = function() {
 
 tree.impurity = function (v) {
   (sum(v) / length(v)) * (length(v) - sum(v)) / length(v)
-}
-
-tree.probableClass = function(class) {
-  return(round((sum(class) / length(class)) + 0.01))
 }
 
 tree.bestsplit = function (x, y) {

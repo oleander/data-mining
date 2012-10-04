@@ -72,8 +72,25 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   )
 }
 
+tree.print = function(node, level = 0) {
+  
+  indent = sprintf(paste0("%", level, "s"), "")
+  
+  if(tree.isNode(node)) {
+    # print(node)
+    cat(indent, sprintf("Node: { bestI: %s, bestS: %s }", node[1], node[2]), "\n")
+    tree.print(node[[3]], level + 2)
+    tree.print(node[[4]], level + 2)
+  } else {
+    # print(length(node))
+    cat(indent, sprintf("Leaf: %s", node), "\n")
+
+  }
+
+}
+
 tree.main = function() {
-  matrix = read.csv('/Users/linus/data.txt')
+  matrix = read.csv('credit.txt')
   tree.grow(matrix[,1:5], matrix[,6])
 }
 

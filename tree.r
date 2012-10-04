@@ -2,21 +2,25 @@
 # @xs Array<Array<Integer>>
 # @tr A custom tree
 #
-tree.classify = function(person, tr) {
-  tree.calcClassify(person, tr)
+tree.classify = function(cases, tr) {
+  classes = c()
+  for (i in 1:(nrow(cases))) {
+    classes[i] = tree.calcClassify(cases[i,], tr)
+  }
+  return(classes)
 }
 
-tree.calcClassify = function(person, tr) {
+tree.calcClassify = function(case, tr) {
   if(tree.isNode(tr)){
     index = tr[[1]][[1]]
-    comp = person[index]
+    comp = case[index]
 
     # Walk left
     if(comp <= tr[[2]]){
-      return(tree.calcClassify(person, tr[[3]]))
+      return(tree.calcClassify(case, tr[[3]]))
     # Walk right
     } else {
-      return(tree.calcClassify(person, tr[[4]]))
+      return(tree.calcClassify(case, tr[[4]]))
     }
   } else if(tree.isLeaf(tr)){
     return(tr)

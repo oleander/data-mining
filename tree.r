@@ -91,7 +91,12 @@ tree.print = function(node, level = 0) {
 
 tree.main = function() {
   matrix = read.csv('credit.txt')
-  tree.grow(matrix[,1:5], matrix[,6])
+  small = tree.grow(matrix[,1:5], matrix[,6])
+
+  matrix = read.csv('pima.txt')
+  large = tree.grow(matrix[,1:8], matrix[,9])
+
+  return(c(small, large))
 }
 
 tree.impurity = function (v) {

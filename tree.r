@@ -8,13 +8,13 @@ tree.classify = function(person, tr) {
 
 tree.calcClassify = function(person, tr) {
   if(tree.isNode(tr)){
-    index = tr[[1]][[1]]
+    index = tr[[3]][[3]]
     comp = person[index]
 
     if(comp <= person[2]){
-      return(tree.calcClassify(person, tr[[3]]))
+      return(tree.calcClassify(person, tr[[5]]))
     } else {
-      return(tree.calcClassify(person, tr[[4]]))
+      return(tree.calcClassify(person, tr[[6]]))
     }
   } else if(tree.isLeaf(tr)){
     return(tr)
@@ -24,16 +24,19 @@ tree.calcClassify = function(person, tr) {
 }
 
 tree.isNode = function(tr) {
-  return(length(tr) == 4)
+  return(length(tr) == 6)
 }
 
 tree.isLeaf = function(tr) {
-  return(class(tr) == "numeric")
+  return(length(tr) == 2)
 }
 
 tree.grow = function(matrix, class, nmin=2, minleaf=1) {
+  nClass0 = length(which(class == 0))
+  nClass1 = length(which(class == 1))
+  
   if(nrow(matrix) < nmin){
-    return(tree.createLeaf(class))
+    return(list(nClass0, nClass1))
   }
 
   bestR = -1
@@ -55,30 +58,25 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   rightClass = class[matrix[,bestI] > bestS]
 
   if(nrow(left) < minleaf || nrow(right) < minleaf) {
-    return(tree.createLeaf(class))
+    return(list(nClass0, nClass1))
   }
 
   leftG = tree.grow(left, leftClass, nmin, minleaf)
   rightG = tree.grow(right, rightClass, nmin, minleaf)
 
   return(
-    list(bestI, bestS, leftG, rightG)
+    list(nClass0, nClass1, bestI, bestS, leftG, rightG)
   )
 }
 
 tree.print = function(node, level = 0) {
-  
   indent = sprintf(paste0("%", level, "s"), "")
-  
   if(tree.isNode(node)) {
-    # print(node)
-    cat(indent, sprintf("Node: { bestI: %s, bestS: %s }", node[1], node[2]), "\n")
-    tree.print(node[[3]], level + 2)
-    tree.print(node[[4]], level + 2)
+    cat(indent, sprintf("Node: (%s|%s) { bestI: %s, bestS: %s }", node[1], node[2], node[3], node[4]), "\n")
+    tree.print(node[[5]], level + 2)
+    tree.print(node[[6]], level + 2)
   } else {
-    # print(length(node))
-    cat(indent, sprintf("Leaf: %s", node), "\n")
-
+    cat(indent, sprintf("Leaf: (%s|%s)", node[1], node[2]), "\n")
   }
 
 }
@@ -92,7 +90,7 @@ tree.impurity = function (v) {
   (sum(v) / length(v)) * (length(v) - sum(v)) / length(v)
 }
 
-tree.createLeaf = function(class) {
+tree.probableClass = function(class) {
   return(round((sum(class) / length(class)) + 0.01))
 }
 

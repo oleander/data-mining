@@ -1,41 +1,3 @@
-tree.grow = function(matrix, class, nmin=2, minleaf=1) {
-  nClass0 = length(which(class == 0))
-  nClass1 = length(which(class == 1))
-  
-  if(nrow(matrix) < nmin || nClass0 == 0 || nClass1 == 0){
-    return(list(nClass0, nClass1))
-  }
-
-  bestR = -1
-  bestS = NULL
-  bestI = NULL
-  for (i in 1:ncol(matrix)) {
-    result = tree.bestsplit(matrix[,i], class)
-    if(result[2] > bestR) {
-      bestR = result[2]
-      bestS = result[1]
-      bestI = i
-    }
-  }
-
-  left = matrix[matrix[,bestI] <= bestS,]
-  leftClass = class[matrix[,bestI] <= bestS]
-
-  right = matrix[matrix[,bestI] > bestS,]
-  rightClass = class[matrix[,bestI] > bestS]
-
-  if(nrow(left) < minleaf || nrow(right) < minleaf) {
-    return(list(nClass0, nClass1))
-  }
-
-  leftG = tree.grow(left, leftClass, nmin, minleaf)
-  rightG = tree.grow(right, rightClass, nmin, minleaf)
-
-  return(
-    list(nClass0, nClass1, bestI, bestS, leftG, rightG)
-  )
-}
-
 #
 # @xs Array<Array<Integer>>
 # @tr A custom tree
@@ -50,76 +12,99 @@ tree.classify = function(cases, tr) {
 
 tree.calcClassify = function(case, tr) {
   if(tree.isNode(tr)){
-    index = tr[[3]]
+    index = tr[[1]][[1]]
     comp = case[index]
 
     # Walk left
-    if(comp <= tr[[4]]){
-      return(tree.calcClassify(case, tr[[5]]))
+    if(comp <= tr[[2]]){
+      return(tree.calcClassify(case, tr[[3]]))
     # Walk right
     } else {
-      return(tree.calcClassify(case, tr[[6]]))
+      return(tree.calcClassify(case, tr[[4]]))
     }
   } else if(tree.isLeaf(tr)){
-    if (tr[[1]] > tr[[2]]) {
-      return(0)
-    } else {
-      return(1)
-    }
+    return(tr)
   } else {
     print("\n\nWTF")
   }
 }
 
-tree.pimaConfusion = function(nmin = 20, minleaf = 5) {
-  data = read.csv('pima.txt', header = FALSE)
-  classes = data[,9]
-  tree   = tree.grow(data[,1:8], classes, nmin, minleaf)
-  classes_ = tree.classify(data[,1:8], tree)
+tree.isNode = function(tr) {
+  return(length(tr) == 4)
+}
 
-  matrix = matrix(c(
-    length(classes[classes == 0 & classes_ == 0]),
-    length(classes[classes == 1 & classes_ == 0]),
-    length(classes[classes == 0 & classes_ == 1]),
-    length(classes[classes == 1 & classes_ == 1])
-  ), 2)
-  return(matrix)
+tree.isLeaf = function(tr) {
+  return(class(tr) == "numeric")
+}
+
+tree.grow = function(matrix, class, nmin=2, minleaf=1) {
+  if(nrow(matrix) < nmin){
+    return(tree.createLeaf(class))
+  }
+
+  bestReduction = -1
+  bestSplit = NULL
+  bestAttributeIndex = NULL
+  for (i in 1:ncol(matrix)) {
+    result = tree.bestsplit(matrix[,i], class)
+    if(result[2] > bestReduction) {
+      bestReduction = result[2]
+      bestSplit = result[1]
+      bestAttributeIndex = i
+    }
+  }
+
+  left = matrix[matrix[,bestAttributeIndex] <= bestSplit,]
+  leftClass = class[matrix[,bestAttributeIndex] <= bestSplit]
+
+  right = matrix[matrix[,bestAttributeIndex] > bestSplit,]
+  rightClass = class[matrix[,bestAttributeIndex] > bestSplit]
+
+  if(nrow(left) < minleaf || nrow(right) < minleaf) {
+    return(tree.createLeaf(class))
+  }
+
+  leftG = tree.grow(left, leftClass, nmin, minleaf)
+  rightG = tree.grow(right, rightClass, nmin, minleaf)
+
+  return(
+    list(bestAttributeIndex, bestSplit, leftG, rightG)
+  )
+}
+
+tree.print = function(node, level = 0) {
+  
+  indent = sprintf(paste0("%", level, "s"), "")
+  
+  if(tree.isNode(node)) {
+    # print(node)
+    cat(indent, sprintf("Node: { bestI: %s, bestS: %s }", node[1], node[2]), "\n")
+    tree.print(node[[3]], level + 2)
+    tree.print(node[[4]], level + 2)
+  } else {
+    # print(length(node))
+    cat(indent, sprintf("Leaf: %s", node), "\n")
+
+  }
+
 }
 
 tree.main = function() {
   matrix = read.csv('credit.txt')
   small = tree.grow(matrix[,1:5], matrix[,6])
 
-  return(small)
-
-  matrix = read.csv('pima.txt', header = FALSE)
+  matrix = read.csv('pima.txt')
   large = tree.grow(matrix[,1:8], matrix[,9])
 
   return(c(small, large))
 }
 
-tree.isNode = function(tr) {
-  return(length(tr) == 6)
-}
-
-tree.isLeaf = function(tr) {
-  return(length(tr) == 2)
-}
-
-tree.print = function(node, level = 0) {
-  indent = sprintf(paste0("%", level, "s"), "")
-  if(tree.isNode(node)) {
-    cat(indent, sprintf("Node: (%s|%s) { bestI: %s, bestS: %s }", node[1], node[2], node[3], node[4]), "\n")
-    tree.print(node[[5]], level + 2)
-    tree.print(node[[6]], level + 2)
-  } else {
-    cat(indent, sprintf("Leaf: (%s|%s)", node[1], node[2]), "\n")
-  }
-
-}
-
 tree.impurity = function (v) {
   (sum(v) / length(v)) * (length(v) - sum(v)) / length(v)
+}
+
+tree.createLeaf = function(class) {
+  return(round((sum(class) / length(class)) + 0.01))
 }
 
 tree.bestsplit = function (x, y) {

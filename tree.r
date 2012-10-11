@@ -126,26 +126,29 @@ tree.bestsplit = function (x, y) {
   x_ <- x[order(x)]
   y_ <- y[order(x)]
 
-  bestR = -1
-  bestS = 0 # "Should be" NULL
+  bestReduction = -1
+  bestSplit = 0 # "Should be" NULL
 
   for (i in 1:(length(x_) - 1))  {
     if (x_[i] == x_[i + 1]) {
       next
     }
 
-    a <- mean(x_[i]:x_[i + 1])
-    left = y_[x_ <= a]
-    right = y_[x_ > a]
+    meanValue <- mean(x_[i]:x_[i + 1])
+    left = y_[x_ <= meanValue]
+    right = y_[x_ > meanValue]
     piLeft <- length(left)/length(x_)
     piRight <- length(right)/length(x_)
 
-    currentR = tree.impurity(y) - (piLeft*tree.impurity(left) + piRight*tree.impurity(right))
-    if(currentR > bestR){
-      bestR = currentR
-      bestS = a
+    currentReduction = 
+      tree.impurity(y) - 
+      (piLeft * tree.impurity(left) + piRight * tree.impurity(right))
+
+    if(currentReduction > bestReduction){
+      bestReduction = currentReduction
+      bestSplit = meanValue
     }
   }
 
-  return(c(bestS, bestR))
+  return(c(bestSplit, bestReduction))
 }

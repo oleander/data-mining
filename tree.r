@@ -50,11 +50,10 @@ tree.classify = function(cases, tr) {
 
 tree.calcClassify = function(case, tr) {
   if(tree.isNode(tr)){
-    index = tr[[3]]
-    comp = case[index]
+    bestSplit = case[tr[[3]]]
 
     # Walk left
-    if(comp <= tr[[4]]){
+    if(bestSplit <= tr[[4]]){
       return(tree.calcClassify(case, tr[[5]]))
     # Walk right
     } else {
@@ -66,8 +65,6 @@ tree.calcClassify = function(case, tr) {
     } else {
       return(1)
     }
-  } else {
-    print("\n\nWTF")
   }
 }
 

@@ -118,10 +118,18 @@ tree.print = function(node, level = 0) {
 
 }
 
-tree.impurity = function (v) {
-  (sum(v) / length(v)) * (length(v) - sum(v)) / length(v)
+tree.impurity = function (classes) {
+  (
+    sum(classes) / length(classes)
+  ) * (
+    length(classes) - sum(classes)
+  ) / length(classes)
 }
 
+#
+# @x List<Integer> A list of values
+# @y List<Integer> A list of binary classes
+#
 tree.bestsplit = function (x, y) {
   x_ <- x[order(x)]
   y_ <- y[order(x)]

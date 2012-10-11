@@ -69,34 +69,43 @@ tree.calcClassify = function(case, tr) {
   }
 }
 
-tree.calcMinErrorRate = function(lowNmin, maxNmin, lowMinleaf, maxMinLeaf, data) {
-  lowestErrorRate = Inf
-  bestNmin = NULL
-  bestMinleaf = NULL
-  for (nmin in lowNmin:maxNmin) {
-    for (minleaf in lowMinleaf:maxMinLeaf) {
-      cat(".")
-      currentLowestErrorRate = tree.errorRate(nmin, minleaf, data)
-      if(currentLowestErrorRate < lowestErrorRate) {
-        bestNmin = nmin
-        bestMinleaf = minleaf
-        lowestErrorRate = currentLowestErrorRate
-      }
-    }
-  }
-
-  return(list(bestNmin, bestMinleaf, lowestErrorRate))
+# brute force method
+tree.calcErrorRates = function(nMins, minLeafs, data) {
 }
 
-tree.errorRate = function(nmin, minleaf, data) {
-    x = ncol(data)
-    classes = data[,x]
-    tree   = tree.grow(data[,1:(x - 1)], classes, nmin, minleaf)
-    classes_ = tree.classify(data[,1:(x - 1)], tree)
+tree.analyse = function(testFactor = 0.25) {
+  data = read.csv('pima.txt', header = FALSE)
+  indexes = 1 : nrow(data)
+  testIndexes = sample(indexes, testFactor * nrow(data))
+  trainingIndexes = indexes[-testIndexes]
+  
+  nMins = seq(2, 60, 7)
+  minLeafs = seq(1, 20, 2)
+
+  result = matrix(nrow = length(nMins), ncol = length(minLeafs), dimnames = list(nMins, minLeafs))
+  
+  for (i in 1:length(nMins)) {
+    nmin = nMins[i]
+    for (j in 1:length(minLeafs)) {
+      minLeaf = minLeafs[j]
+      errorRate = tree.errorRate(nmin, minLeaf, data[trainingIndexes,], data[testIndexes,])
+      result[i,j] = errorRate
+      cat(".")
+    }
+  }
+  cat("\n")
+  return(result)
+}
+
+tree.errorRate = function(nmin, minleaf, trainingData, testData) {
+    x = ncol(trainingData)
+    tree   = tree.grow(trainingData[,1:(x - 1)], trainingData[,x], nmin, minleaf)
+    classes = testData[,x]
+    classes_ = tree.classify(testData[,1:(x - 1)], tree)
     return(100 - 100 * (length(classes[(classes == classes_) == TRUE]) / length(classes)))
 }
 
-tree.pimaConfusion = function(nmin = 20, minleaf = 5) {
+tree.pimaConfusion = function(nmin = 2, minleaf = 1) {
   data = read.csv('pima.txt', header = FALSE)
   classes = data[,9]
   tree   = tree.grow(data[,1:8], classes, nmin, minleaf)
@@ -152,20 +161,6 @@ tree.impurity = function (classes) {
   ) / length(classes)
 }
 
-#
-# @x List<Integer> A list of values
-# @y List<Integer> A list of binary classes
-#
-tree.main = function() {
-  matrix = read.csv('credit.txt')
-  small = tree.grow(matrix[,1:5], matrix[,6])
-
-  matrix = read.csv('pima.txt')
-  large = tree.grow(matrix[,1:8], matrix[,9])
-
-  return(large)#(c(small, large))[[2]]
-}
-
 tree.createLeaf = function(class) {
   return(round((sum(class) / length(class)) + 0.01))
 }
@@ -185,6 +180,10 @@ tree.pimaConfusion = function(nmin = 20, minleaf = 5) {
   return(matrix)
 }
 
+#
+# @x List<Integer> A list of values
+# @y List<Integer> A list of binary classes
+#
 tree.bestsplit = function (x, y, minleaf) {
   x_ <- x[order(x)]
   y_ <- y[order(x)]

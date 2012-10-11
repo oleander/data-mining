@@ -68,6 +68,15 @@ tree.calcClassify = function(case, tr) {
   }
 }
 
+tree.errorRate = function(nmin, minleaf, data) {
+    # data = read.csv('pima.txt', header = FALSE)
+    x = ncol(data)
+    classes = data[,x]
+    tree   = tree.grow(data[,1:(x - 1)], classes, nmin, minleaf)
+    classes_ = tree.classify(data[,1:(x - 1)], tree)
+    return(100 - 100 * (length(classes[(classes == classes_) == TRUE]) / length(classes)))
+}
+
 tree.pimaConfusion = function(nmin = 20, minleaf = 5) {
   data = read.csv('pima.txt', header = FALSE)
   classes = data[,9]
@@ -87,11 +96,12 @@ tree.main = function() {
   matrix = read.csv('credit.txt')
   small = tree.grow(matrix[,1:5], matrix[,6])
 
-  return(small)
+  # return(small)
 
   matrix = read.csv('pima.txt', header = FALSE)
   large = tree.grow(matrix[,1:8], matrix[,9])
 
+  return(large)
   return(c(small, large))
 }
 
@@ -134,7 +144,7 @@ tree.main = function() {
   matrix = read.csv('pima.txt')
   large = tree.grow(matrix[,1:8], matrix[,9])
 
-  return(c(small, large))
+  return(large)#(c(small, large))[[2]]
 }
 
 tree.createLeaf = function(class) {

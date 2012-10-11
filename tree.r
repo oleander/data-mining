@@ -9,6 +9,7 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   bestR = -1
   bestS = NULL
   bestI = NULL
+
   for (i in 1:ncol(matrix)) {
     result = tree.bestsplit(matrix[,i], class, minleaf)
     if(result[2] > bestR) {
@@ -16,6 +17,10 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
       bestS = result[1]
       bestI = i
     }
+  }
+
+  if(is.null(bestI)){
+    return(list(nClass0, nClass1))
   }
 
   left = matrix[matrix[,bestI] <= bestS,]
@@ -64,8 +69,26 @@ tree.calcClassify = function(case, tr) {
   }
 }
 
+tree.calcMinErrorRate = function(lowNmin, maxNmin, lowMinleaf, maxMinLeaf, data) {
+  lowestErrorRate = Inf
+  bestNmin = NULL
+  bestMinleaf = NULL
+  for (nmin in lowNmin:maxNmin) {
+    for (minleaf in lowMinleaf:maxMinLeaf) {
+      cat(".")
+      currentLowestErrorRate = tree.errorRate(nmin, minleaf, data)
+      if(currentLowestErrorRate < lowestErrorRate) {
+        bestNmin = nmin
+        bestMinleaf = minleaf
+        lowestErrorRate = currentLowestErrorRate
+      }
+    }
+  }
+
+  return(list(bestNmin, bestMinleaf, lowestErrorRate))
+}
+
 tree.errorRate = function(nmin, minleaf, data) {
-    # data = read.csv('pima.txt', header = FALSE)
     x = ncol(data)
     classes = data[,x]
     tree   = tree.grow(data[,1:(x - 1)], classes, nmin, minleaf)

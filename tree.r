@@ -10,7 +10,7 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   bestS = NULL
   bestI = NULL
   for (i in 1:ncol(matrix)) {
-    result = tree.bestsplit(matrix[,i], class)
+    result = tree.bestsplit(matrix[,i], class, minleaf)
     if(result[2] > bestR) {
       bestR = result[2]
       bestS = result[1]
@@ -23,10 +23,6 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
 
   right = matrix[matrix[,bestI] > bestS,]
   rightClass = class[matrix[,bestI] > bestS]
-
-  if(nrow(left) < minleaf || nrow(right) < minleaf) {
-    return(list(nClass0, nClass1))
-  }
 
   leftG = tree.grow(left, leftClass, nmin, minleaf)
   rightG = tree.grow(right, rightClass, nmin, minleaf)
@@ -60,10 +56,10 @@ tree.calcClassify = function(case, tr) {
       return(tree.calcClassify(case, tr[[6]]))
     }
   } else if(tree.isLeaf(tr)){
-    if (tr[[1]] > tr[[2]]) {
-      return(0)
-    } else {
+    if (tr[[2]] > tr[[1]]) {
       return(1)
+    } else {
+      return(0)
     }
   }
 }
@@ -166,7 +162,7 @@ tree.pimaConfusion = function(nmin = 20, minleaf = 5) {
   return(matrix)
 }
 
-tree.bestsplit = function (x, y) {
+tree.bestsplit = function (x, y, minleaf) {
   x_ <- x[order(x)]
   y_ <- y[order(x)]
 
@@ -181,6 +177,11 @@ tree.bestsplit = function (x, y) {
     meanValue <- mean(x_[i]:x_[i + 1])
     left = y_[x_ <= meanValue]
     right = y_[x_ > meanValue]
+    
+    if (length(left) < minleaf || length(right) < minleaf) {
+      next
+    }
+    
     piLeft <- length(left)/length(x_)
     piRight <- length(right)/length(x_)
 

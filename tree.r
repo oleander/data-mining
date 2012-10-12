@@ -70,6 +70,8 @@ tree.calcClassify = function(case, tr) {
 }
 
 tree.calcMinErrorRate = function(lowNmin, maxNmin, lowMinleaf, maxMinLeaf, data) {
+  print(sprintf("%d calculations", (lowNmin - maxNmin) * (lowMinleaf - maxMinLeaf)))
+  
   lowestErrorRate = Inf
   bestNmin = NULL
   bestMinleaf = NULL

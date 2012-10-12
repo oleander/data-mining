@@ -1,3 +1,12 @@
+#
+# Creates a classification tree based on ingoing matrix
+#
+# @matrix List<List<Integer>> Matrix to grow a tree from
+# @class List<Integer> A list of binary classes
+# @nmin Integer Number of observations that a node must contain for it to be split
+# @minleaf Integer Minimum amount of leafs in tree
+# @return Tree A custom tree
+#
 tree.grow = function(matrix, class, nmin=2, minleaf=1) {
   nClass0 = length(which(class == 0))
   nClass1 = length(which(class == 1))
@@ -38,8 +47,11 @@ tree.grow = function(matrix, class, nmin=2, minleaf=1) {
 }
 
 #
-# @xs Array<Array<Integer>>
-# @tr A custom tree
+# Classifies ingoing cases
+#
+# @cases List<List<Integer>> A list of items to be classified
+# @tr Tree A custom tree
+# @return List<Integer> A list of binary classes
 #
 tree.classify = function(cases, tr) {
   classes = c()
@@ -49,6 +61,13 @@ tree.classify = function(cases, tr) {
   return(classes)
 }
 
+#
+# Recursively classifies one single case
+#
+# @case List<Integer> An item to be classified
+# @tr Tree A custom tree
+# @return Integer A binary class, 0 or 1
+#
 tree.calcClassify = function(case, tr) {
   if(tree.isNode(tr)){
     bestSplit = case[tr[[3]]]
@@ -69,10 +88,23 @@ tree.calcClassify = function(case, tr) {
   }
 }
 
-# brute force method
-tree.calcErrorRates = function(nMins, minLeafs, data) {
-}
-
+#
+# Uses bruteforce to calculate the best values for nMin and minLeaft
+#
+# @testFactor Float How many percent of the pima data should be used for testing? [0, 1]
+# @return Matrix See example below
+#
+#           1        3        5        7        9       11       13       15       17       19
+# 2  28.12500 27.08333 29.16667 22.91667 20.31250 21.35417 23.95833 25.52083 23.43750 23.43750
+# 9  27.60417 27.60417 29.16667 22.91667 20.31250 21.35417 23.95833 25.52083 23.43750 23.43750
+# 16 23.95833 24.47917 26.04167 23.43750 20.31250 21.35417 23.95833 25.52083 23.43750 23.43750
+# 23 23.95833 23.43750 22.91667 21.87500 20.83333 21.35417 23.95833 25.52083 23.43750 23.43750
+# 30 26.56250 26.56250 26.04167 26.56250 26.04167 25.00000 23.43750 25.52083 23.43750 23.43750
+# 37 21.87500 21.87500 21.35417 21.35417 21.35417 21.35417 23.43750 23.95833 23.43750 23.43750
+# 44 21.87500 21.87500 21.35417 21.35417 21.35417 21.35417 23.43750 23.43750 23.43750 23.43750
+# 51 24.47917 24.47917 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833
+# 58 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833 23.95833
+#
 tree.analyse = function(testFactor = 0.25) {
   data = read.csv('pima.txt', header = FALSE)
   indexes = 1 : nrow(data)
@@ -134,6 +166,15 @@ tree.heatmap = function(file = "result.csv") {
   
 }
 
+#
+# Calculates the error rate based on training (@trainingData) and test (@testData) data
+#
+# @nmin Integer Number of observations that a node must contain for it to be split
+# @minleaf Integer Minimum amount of leafs in tree
+# @trainingData Matrix Data used for building the classification tree
+# @testData Matrix Data to used for comparison
+# @return Float Error rate in percent [0, 100]
+#
 tree.errorRate = function(nmin, minleaf, trainingData, testData) {
     x = ncol(trainingData)
     tree   = tree.grow(trainingData[,1:(x - 1)], trainingData[,x], nmin, minleaf)
@@ -142,6 +183,17 @@ tree.errorRate = function(nmin, minleaf, trainingData, testData) {
     return(100 - 100 * (length(classes[(classes == classes_) == TRUE]) / length(classes)))
 }
 
+#
+# A visual presentation of the error rate using a matrix as output
+#
+# @nmin Integer Number of observations that a node must contain for it to be split
+# @minleaf Integer Minimum amount of leafs in tree
+# @return Matrix See example below
+#
+#      [,1] [,2]
+# [1,]  444   56
+# [2,]   54  214 
+#
 tree.pimaConfusion = function(nmin = 2, minleaf = 1) {
   data = read.csv('pima.txt', header = FALSE)
   classes = data[,9]
@@ -157,27 +209,32 @@ tree.pimaConfusion = function(nmin = 2, minleaf = 1) {
   return(matrix)
 }
 
-tree.main = function() {
-  matrix = read.csv('credit.txt')
-  small = tree.grow(matrix[,1:5], matrix[,6])
-
-  # return(small)
-
-  matrix = read.csv('pima.txt', header = FALSE)
-  large = tree.grow(matrix[,1:8], matrix[,9])
-
-  return(large)
-  return(c(small, large))
+#
+# Is the given @item a node?
+#
+# @item Node || Leaf
+# @return Boolean Is the @item a node?
+#
+tree.isNode = function(item) {
+  return(length(item) == 6)
 }
 
-tree.isNode = function(tr) {
-  return(length(tr) == 6)
+#
+# Is the given @item a leaf?
+#
+# @item Node || Leaf
+# @return Boolean Is the @item a leaf?
+#
+tree.isLeaf = function(item) {
+  return(length(item) == 2)
 }
 
-tree.isLeaf = function(tr) {
-  return(length(tr) == 2)
-}
-
+#
+# Prints ingoing @node in a readable format
+#
+# @node Leaf || Node Item to be printed
+# @level Integer The amount of indentations used for each hierarchy
+#
 tree.print = function(node, level = 0) {
   indent = sprintf(paste0("%", level, "s"), "")
   if(tree.isNode(node)) {
@@ -190,7 +247,13 @@ tree.print = function(node, level = 0) {
 
 }
 
-tree.impurity = function (classes) {
+#
+# Calculates impurity
+#
+# @classes List<Integer> A list of classes
+# @return Integer The impurity
+#
+tree.impurity = function(classes) {
   (
     sum(classes) / length(classes)
   ) * (
@@ -198,30 +261,17 @@ tree.impurity = function (classes) {
   ) / length(classes)
 }
 
-tree.createLeaf = function(class) {
-  return(round((sum(class) / length(class)) + 0.01))
-}
-
-tree.pimaConfusion = function(nmin = 20, minleaf = 5) {
-  data = read.csv('pima.txt', header = FALSE)
-  classes = data[,9]
-  tree   = tree.grow(data[,1:8], classes, nmin, minleaf)
-  classes_ = tree.classify(data[,1:8], tree)
-
-  matrix = matrix(c(
-    length(classes[classes == 0 & classes_ == 0]),
-    length(classes[classes == 1 & classes_ == 0]),
-    length(classes[classes == 0 & classes_ == 1]),
-    length(classes[classes == 1 & classes_ == 1])
-  ), 2)
-  return(matrix)
-}
-
 #
-# @x List<Integer> A list of values
-# @y List<Integer> A list of binary classes
+# Calculates the best split value
 #
-tree.bestsplit = function (x, y, minleaf) {
+# @values List<Integer> A list of values
+# @classes List<Integer> A list of binary classes
+# @minleaf Integer Minimum amount of leafs in tree
+# @return List<Integer, Integer>
+#  bestSplit What value should one split on?
+#  bestReduction How much was the reduction?
+#
+tree.bestsplit = function (values, classes, minleaf) {
   x_ <- x[order(x)]
   y_ <- y[order(x)]
 

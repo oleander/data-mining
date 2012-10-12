@@ -79,8 +79,8 @@ tree.analyse = function(testFactor = 0.25) {
   testIndexes = sample(indexes, testFactor * nrow(data))
   trainingIndexes = indexes[-testIndexes]
   
-  nMins = seq(2, 60, 7)
-  minLeafs = seq(1, 20, 2)
+  nMins = seq(2, 40, 1)
+  minLeafs = seq(1, 20, 1)
 
   result = matrix(nrow = length(nMins), ncol = length(minLeafs), dimnames = list(nMins, minLeafs))
   
@@ -97,8 +97,8 @@ tree.analyse = function(testFactor = 0.25) {
 
       if(errorRate < bestErrorRate){
         bestErrorRate = errorRate
-        bestNmin = i
-        bestMinleaf = j
+        bestNmin = nmin
+        bestMinleaf = minLeaf
       }
 
       cat(".")
@@ -107,6 +107,31 @@ tree.analyse = function(testFactor = 0.25) {
   cat("\n")
   print(sprintf("nMin: %f, minLeaf: %f, errorRate: %f", bestNmin, bestMinleaf, bestErrorRate))
   return(result)
+}
+
+tree.sample = function(nmin, minLeaf, testFactor = 0.25, iterations = 100) {
+  data = read.csv('pima.txt', header = FALSE)
+  indexes = 1 : nrow(data)
+  results = c()
+  
+  for (i in 1 : iterations) {
+    testIndexes = sample(indexes, testFactor * nrow(data))
+    trainingIndexes = indexes[-testIndexes]
+    errorRate = tree.errorRate(nmin, minLeaf, data[trainingIndexes,], data[testIndexes,])
+    results[i] = errorRate
+    cat(".")
+  }
+  cat("\n")
+  
+  return(results)
+}
+
+tree.heatmap = function(file = "result.csv") {
+  d = read.csv(file, row.names = 1)
+  image(
+    z = z <- data.matrix(d),
+    col=gray((0:32)/32))
+  
 }
 
 tree.errorRate = function(nmin, minleaf, trainingData, testData) {

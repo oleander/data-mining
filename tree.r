@@ -111,8 +111,8 @@ tree.analyse = function(testFactor = 0.25) {
   testIndexes = sample(indexes, testFactor * nrow(data))
   trainingIndexes = indexes[-testIndexes]
   
-  nMins = seq(2, 40, 1)
-  minLeafs = seq(1, 20, 1)
+  nMins = seq(2, 10, 1)
+  minLeafs = seq(1, 50, 3)
 
   result = matrix(nrow = length(nMins), ncol = length(minLeafs), dimnames = list(nMins, minLeafs))
   
@@ -120,12 +120,20 @@ tree.analyse = function(testFactor = 0.25) {
   bestNmin = NULL
   bestMinleaf = NULL
 
+  x = c()
+  y = c()
+  z = c()
+  cc = 0
   for (i in 1:length(nMins)) {
     nmin = nMins[i]
     for (j in 1:length(minLeafs)) {
       minLeaf = minLeafs[j]
       errorRate = tree.errorRate(nmin, minLeaf, data[trainingIndexes,], data[testIndexes,])
       result[i,j] = errorRate
+
+      x[cc] = minLeaf
+      y[cc] = nmin
+      z[cc] = errorRate
 
       if(errorRate < bestErrorRate){
         bestErrorRate = errorRate
@@ -134,10 +142,16 @@ tree.analyse = function(testFactor = 0.25) {
       }
 
       cat(".")
+      cc = cc + 1
     }
   }
   cat("\n")
+
   print(sprintf("nMin: %f, minLeaf: %f, errorRate: %f", bestNmin, bestMinleaf, bestErrorRate))
+
+  planes3d(x,y,z)
+  plot3d(x,y,z, zlab="errorRate", xlab="minLeaf", ylab="nmin")
+
   return(result)
 }
 
@@ -272,8 +286,8 @@ tree.impurity = function(classes) {
 #  bestReduction How much was the reduction?
 #
 tree.bestsplit = function (values, classes, minleaf) {
-  x_ <- x[order(x)]
-  y_ <- y[order(x)]
+  x_ <- values[order(values)]
+  y_ <- classes[order(values)]
 
   bestReduction = -1
   bestSplit = 0 # "Should be" NULL

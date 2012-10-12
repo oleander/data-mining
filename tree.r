@@ -79,8 +79,8 @@ tree.analyse = function(testFactor = 0.25) {
   testIndexes = sample(indexes, testFactor * nrow(data))
   trainingIndexes = indexes[-testIndexes]
   
-  nMins = seq(2, 60, 7)
-  minLeafs = seq(1, 20, 2)
+  nMins = seq(2, 60, 5)
+  minLeafs = seq(1, 50, 2)
 
   result = matrix(nrow = length(nMins), ncol = length(minLeafs), dimnames = list(nMins, minLeafs))
   
@@ -97,8 +97,8 @@ tree.analyse = function(testFactor = 0.25) {
 
       if(errorRate < bestErrorRate){
         bestErrorRate = errorRate
-        bestNmin = i
-        bestMinleaf = j
+        bestNmin = nmin
+        bestMinleaf = minLeaf
       }
 
       cat(".")

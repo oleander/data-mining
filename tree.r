@@ -155,6 +155,15 @@ tree.analyse = function(testFactor = 0.25) {
   return(result)
 }
 
+#
+# For given nmin and minLeaf, calculate a different tree from different random samples of the data 100 times
+# and calculate the error rates
+#
+# @nmin       numeric Number of observations that a node must contain for it to be split
+# @minleaf    numeric Minimum amount of leafs in tree
+# @testFactor numeric amount of data to reserve for testing the tree (the rest is used for training)
+# @return     numeric vector with the error rates
+#
 tree.sample = function(nmin, minLeaf, testFactor = 0.25, iterations = 100) {
   data = read.csv('pima.txt', header = FALSE)
   indexes = 1 : nrow(data)
@@ -301,7 +310,7 @@ tree.bestsplit = function (values, classes, minleaf) {
     piRight <- length(right)/length(x_)
 
     currentReduction = 
-      tree.impurity(y) - 
+      tree.impurity(classes) - 
       (piLeft * tree.impurity(left) + piRight * tree.impurity(right))
 
     if(currentReduction > bestReduction){

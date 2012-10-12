@@ -84,16 +84,28 @@ tree.analyse = function(testFactor = 0.25) {
 
   result = matrix(nrow = length(nMins), ncol = length(minLeafs), dimnames = list(nMins, minLeafs))
   
+  bestErrorRate = Inf
+  bestNmin = NULL
+  bestMinleaf = NULL
+
   for (i in 1:length(nMins)) {
     nmin = nMins[i]
     for (j in 1:length(minLeafs)) {
       minLeaf = minLeafs[j]
       errorRate = tree.errorRate(nmin, minLeaf, data[trainingIndexes,], data[testIndexes,])
       result[i,j] = errorRate
+
+      if(errorRate < bestErrorRate){
+        bestErrorRate = errorRate
+        bestNmin = i
+        bestMinleaf = j
+      }
+
       cat(".")
     }
   }
   cat("\n")
+  print(sprintf("nMin: %f, minLeaf: %f, errorRate: %f", bestNmin, bestMinleaf, bestErrorRate))
   return(result)
 }
 

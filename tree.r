@@ -172,14 +172,6 @@ tree.sample = function(nmin, minLeaf, testFactor = 0.25, iterations = 100) {
   return(results)
 }
 
-tree.heatmap = function(file = "result.csv") {
-  d = read.csv(file, row.names = 1)
-  image(
-    z = z <- data.matrix(d),
-    col=gray((0:32)/32))
-  
-}
-
 #
 # Calculates the error rate based on training (@trainingData) and test (@testData) data
 #

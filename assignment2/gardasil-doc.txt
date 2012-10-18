@@ -1,0 +1,75 @@
+NAME:  gardasil.dat
+TYPE:  Retrospective Study (Potential Predictors for Completion or Non-Completion of 
+the Three-Shot Anti-HPV Gardasil Vaccine Regimen)
+SIZE:  1413 observations, 10 variables
+
+ARTICLE TITLE:  Examining Potential Predictors for Completion of the Gardasil
+Vaccine Sequence Based on Data Gathered at Clinics of Johns Hopkins Medical 
+Institutions 
+
+DESCRIPTIVE ABSTRACT:  The tab-delimited data set gives characteristics of young female patients between
+the ages of 11 to 26 who came to clinics of Johns Hopkins Medical Institutions between
+2006 and 2008 to begin the three-shot regimen of vaccinations with the anti-human
+papillomavirus (HPV) medication Gardasil.   
+
+SOURCES:  The data were gathered from written and electronic records at four clinics of 
+Johns Hopkins Medical Institutions (JHMI) at which the Gardasil vaccine is currently
+available.  Two of the clinics (Odenton, White Marsh) are located in suburban Baltimore,
+while the other two (Bayview and Johns Hopkins Hospital Outpatient Center) are located
+in Baltimore City.
+
+VARIABLE DESCRIPTIONS:  
+Age = the patient's age in years
+AgeGroup = the age group in which the patient falls (0 = 11-17 years, 1 = 18-26 years)
+Race = the patient's race (0 = white, 1 = black, 2 = Hispanic, 3 = other/unknown)
+Shots = the number of shots that the patients completed during a period of 12 months from
+the time of the first shot
+Completed = did the patient complete the three-shot regimen within the recommended period
+of 12 months (0 = no, 1 = yes)
+InsuranceType = the type of insurance that the patient had (0 = medical assistance, 1 = 
+private payer [Blue Cross Blue Shield, Aetna, Cigna, United, Commercial, CareFirst], 2 = 
+hospital based [EHF], 3 = military [USFHP, Tricare, MA])
+MedAssist = did the patient have some type of medical assistance (0 = no, 1 = yes)
+Location = the clinic that the patient attended (1 = Odenton, 2 = White Marsh, 3 = 
+Johns Hopkins Outpatient Center, 4 = Bayview)
+LocationType = was the clinic in a suburban or an urban location (0 = suburban, 1 = urban)
+PracticeType = the type of practice that the patient visited (0 = pediatric, 1 = family
+practice, 2 = OB-GYN)
+
+SPECIAL NOTES: n/a
+
+STORY BEHIND THE DATA:  The Gardasil vaccine for human papillomavirus (HPV) has been
+available since 2006, but its adoption has been a slow process.  An early study of young
+female patients in Southern California (1) suggested that race and socioeconomic status
+are particularly useful factors in predicting the likelihood that a patient will complete
+the three-shot Gardasil regimen within the recommended period of 12 months.  This data set
+was gathered in an attempt to identify similar potential predictors for patients attending
+JHMI clinics in Baltimore County and Baltimore City. The potential predictors, chosen from
+the available demographic information, were type of insurance coverage the patient had, 
+location of the clinic the patient visited (suburban or urban), type of practice the 
+patient visited, patient age group (11-17 or 18-26 years), and patient race.  To simplify 
+analysis of the insurance predictor, an indicator variable was created to indicate 
+patients who did or did not possess some type of government-sponsored medical assistance. 
+
+PEDAGOGICAL NOTES:  The data set presented in this paper provides an excellent source of 
+"raw material" for introductory lessons and assignments in categorical data analysis.
+The instructor may choose to use the data to illustrate simple graphical techniques for
+depicting the distribution of a single categorical variable, inference procedures 
+appropriate for categorical data (such as two-proportion z tests and chi-square tests), 
+and graphical and numerical methods of analyzing relationships between categorical
+variables (including the effects of the presence of a confounding variable on the
+relationship).  Advanced classes may also use the data set to practice logistic regression
+techniques for identifying the "best" subset of potential predictors for predicting
+membership in the "Completed" categories.
+  
+REFERENCES:  
+(1)  Chao, C., et al. (2009).  "Correlates for Completion of 3-Dose Regimen of HPV Vaccine 
+in Female Members of a Managed Care Organization." Mayo Clinical Proceedings 84, 864-870.
+
+SUBMITTED BY:
+Dr. Christopher Barat
+Stevenson University
+1525 Greenspring Valley Rd.
+Stevenson, MD 21153
+cbarat@stevenson.edu
+ 

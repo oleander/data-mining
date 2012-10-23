@@ -18,12 +18,15 @@ n = function(v) {
 #         P := P \ {v}
 #         X := X ⋃ {v}
 bk = function(R,P,X) {
-  if(length(P) == 0 && length(X) == 0){
+  print(P)
+  print(X)
+  if(nrow(P) == 0 && length(X) == 0){
     return(X)
   }
-
+  
   for (v in 1:nrow(P)) {
-    bk(c(R, v), intersect(P, n(v)), intersect(X, n(v)))
+    # bk(c(R, v), intersect(P, n(v)), intersect(X, n(v)))
+    bk(c(R, v), P[n(v)-v,], intersect(X, n(v)))
     P = P[-1,]
     X = c(C, v)
   }

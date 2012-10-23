@@ -34,7 +34,8 @@ calcC = function(matrix) {
 # BronKerbosch1(R,P,X):
 #     if P and X are both empty:
 #         report R as a maximal clique
-#     for each vertex v in P:
+#     choose a pivot vertex u in P ⋃ X
+#     for each vertex v in P \ N(u):
 #         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
 #         P := P \ {v}
 #         X := X ⋃ {v}
@@ -45,7 +46,8 @@ bk = function(R,P,X, res = list()) {
     return
   }
 
-  for (v in P) {
+  u = union(P, X)[1]
+  for (v in setdiff(P,n(u))) {
     bk(union(R, v), intersect(P, n(v)), intersect(X, n(v)))
     P = P[-1]
     X = union(X, v)

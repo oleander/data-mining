@@ -21,6 +21,28 @@ graph.init = matrix(c(
   0,1,1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,0
 ), 5, 5)
 
+
+gm.search = function(observed, graph.init, forward, backward, score){
+  cliques = bk(graph.init)
+  deviance = loglin(observed, cliques)[1]
+  
+  
+  
+  
+}
+
+gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backward, score){
+  
+}
+
+gm.aic = function(model, deviance){
+  deviance + 2 * nrow(model)
+}
+
+gm.bic = function(model, deviance, observed){
+  deviance + log(nrow(observed), exp(1)) * nrow(model)
+}
+
 graph.result = list()
 
 n = function(v) {
@@ -39,7 +61,7 @@ calcC = function(matrix) {
 #         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
 #         P := P \ {v}
 #         X := X ⋃ {v}
-bk = function(R,P,X, res = list()) {
+bk = function(R = c(),P,X = c(), res = list()) {
   if(length(P) == 0 && length(X) == 0){
     graph.result = c(graph.result, R)
     print(R)

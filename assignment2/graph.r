@@ -21,8 +21,6 @@ graph.init = matrix(c(
   0,1,1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,0
 ), 5, 5)
 
-graph.result = list()
-
 n = function(v) {
   which(graph.init[v,] == 1, arr.in=TRUE)
 }
@@ -39,17 +37,16 @@ calcC = function(matrix) {
 #         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
 #         P := P \ {v}
 #         X := X ⋃ {v}
-bk = function(R,P,X, res = list()) {
+bk = function(R,P,X) {
   if(length(P) == 0 && length(X) == 0){
-    graph.result = c(graph.result, R)
-    print(R)
-    return
+    return(list(R))
   }
-
+  cliques = list()
   u = union(P, X)[1]
   for (v in setdiff(P,n(u))) {
-    bk(union(R, v), intersect(P, n(v)), intersect(X, n(v)))
+    cliques = c(cliques, bk(union(R, v), intersect(P, n(v)), intersect(X, n(v))))
     P = P[-1]
     X = union(X, v)
   }
+  return(cliques)
 }

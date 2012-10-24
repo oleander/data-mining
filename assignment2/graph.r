@@ -41,7 +41,7 @@ calcC = function(matrix) {
 #         X := X ⋃ {v}
 bk = function(R,P,X, res = list()) {
   if(length(P) == 0 && length(X) == 0){
-    graph.result[[length(graph.result) + 1]] = R
+    graph.result = c(graph.result, R)
     print(R)
     return
   }

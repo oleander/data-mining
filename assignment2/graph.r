@@ -22,8 +22,7 @@ graph.init = matrix(c(
 ), 5, 5)
 
 gm.search = function(observed, graph.init, forward, backward, scoreType){
-  cliques = bk(graph.init)
-  deviance = loglin(observed, cliques)[1]
+  
   
   score(graph.init, deviance)
   
@@ -67,13 +66,23 @@ gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backwar
   
 }
 
-gm.aic = function(model, deviance){
-  deviance + 2 * nrow(model)
+gm.score = function(model, observed, scoreType){
+  cliques = calcC(model)
+  deviance = loglin(observed, cliques)[[1]]
+  
+  if(scoreType == "aic"){
+    return (deviance + 2 * nrow(model))
+    
+  } else if (scoreType == "bic"){    
+    return (deviance + log(nrow(observed), exp(1)) * nrow(model))
+    
+  } else {    
+    return -1
+  }
+  
 }
 
-gm.bic = function(model, deviance, observed){
-  deviance + log(nrow(observed), exp(1)) * nrow(model)
-}
+
 
 
 calcC = function(graph) {

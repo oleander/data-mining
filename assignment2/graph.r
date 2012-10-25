@@ -75,35 +75,36 @@ gm.bic = function(model, deviance, observed){
   deviance + log(nrow(observed), exp(1)) * nrow(model)
 }
 
-graph.result = list()
 
-
-n = function(v, matrix) {
-  which(matrix[v,] == 1, arr.in=TRUE)
-}
-
-calcC = function(matrix) {
-  bk(c(), 1:nrow(matrix), c(), matrix)
-}
-
-# BronKerbosch1(R,P,X):
-#     if P and X are both empty:
-#         report R as a maximal clique
-#     choose a pivot vertex u in P ⋃ X
-#     for each vertex v in P \ N(u):
-#         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
-#         P := P \ {v}
-#         X := X ⋃ {v}
-bk = function(R = c(),P,X = c(), matrix) {
-  if(length(P) == 0 && length(X) == 0){
-    return(list(R))
+calcC = function(graph) {
+  
+  # find neighbors of vertex v in graph
+  neighbors = function(v) {
+    which(graph[v,] == 1, arr.in=TRUE)
   }
-  cliques = list()
-  u = union(P, X)[1]
-  for (v in setdiff(P,n(u, matrix))) {
-    cliques = c(cliques, bk(union(R, v), intersect(P, n(v, matrix)), intersect(X, n(v, matrix))))
-    P = P[-1]
-    X = union(X, v)
+  
+  # BronKerbosch1(R,P,X):
+  #     if P and X are both empty:
+  #         report R as a maximal clique
+  #     choose a pivot vertex u in P ⋃ X
+  #     for each vertex v in P \ N(u):
+  #         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
+  #         P := P \ {v}
+  #         X := X ⋃ {v}
+  bk = function(R = c(), P, X = c()) {
+    if(length(P) == 0 && length(X) == 0){
+      return(list(R))
+    }
+    cliques = list()
+    u = union(P, X)[1]
+    for (v in setdiff(P, neighbors(u))) {
+      cliques = c(cliques, bk(union(R, v), intersect(P, neighbors(v)), intersect(X, neighbors(v))))
+      P = P[-1]
+      X = union(X, v)
+    }
+    return(cliques)
   }
-  return(cliques)
+  
+  bk(P = 1:nrow(graph))
 }
+

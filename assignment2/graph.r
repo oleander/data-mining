@@ -21,11 +21,47 @@ graph.init = matrix(c(
   0,1,1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,0
 ), 5, 5)
 
-gm.search = function(observed, graph.init, forward, backward, score){
+gm.search = function(observed, graph.init, forward, backward, scoreType){
   cliques = bk(graph.init)
   deviance = loglin(observed, cliques)[1]
+  
+  score(graph.init, deviance)
+  
+  hillClimb(observed, graph.init, forward, backward, scoreType)
+  
+  
+  bestNeighbour = NULL
+
+    
+    bestScore = NULL
+    for (v1 in 1:nrow(observed)){
+      for (v2 in 1:(v1 - 1)){
+        evalModel = model  
+        if(model[vertex1, vertex2] == 1 && backward){
+          
+          evalModel[vertex1, vertex2] == 0
+          score(evalModel, )
+          
+        } else if (model[vertex1, vertex2] == 0 && forward){
+          evalModel[vertex1, vertex2] == 1
+          score(evalModel, )
+          
+        }
+      }
+    }
+    
+    
+  
    
 }
+
+gm.hillClimb = function(scoreValue, model, forward, backward, scoreType  ){
+  
+}
+
+
+
+
 
 gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backward, score){
   
@@ -42,12 +78,12 @@ gm.bic = function(model, deviance, observed){
 graph.result = list()
 
 
-n = function(v) {
-  which(graph.init[v,] == 1, arr.in=TRUE)
+n = function(v, matrix) {
+  which(matrix[v,] == 1, arr.in=TRUE)
 }
 
 calcC = function(matrix) {
-  bk(c(), 1:nrow(matrix), c())
+  bk(c(), 1:nrow(matrix), c(), matrix)
 }
 
 # BronKerbosch1(R,P,X):
@@ -58,14 +94,14 @@ calcC = function(matrix) {
 #         BronKerbosch1(R ⋃ {v}, P ⋂ N(v), X ⋂ N(v))
 #         P := P \ {v}
 #         X := X ⋃ {v}
-bk = function(R = c(),P,X = c(), res = list()) {
+bk = function(R = c(),P,X = c(), matrix) {
   if(length(P) == 0 && length(X) == 0){
     return(list(R))
   }
   cliques = list()
   u = union(P, X)[1]
-  for (v in setdiff(P,n(u))) {
-    cliques = c(cliques, bk(union(R, v), intersect(P, n(v)), intersect(X, n(v))))
+  for (v in setdiff(P,n(u, matrix))) {
+    cliques = c(cliques, bk(union(R, v), intersect(P, n(v, matrix)), intersect(X, n(v, matrix))))
     P = P[-1]
     X = union(X, v)
   }

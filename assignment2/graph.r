@@ -68,20 +68,15 @@ gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backwar
 
 gm.score = function(model, observed, scoreType){
   cliques = calcC(model)
-  result = loglin(observed, cliques)
+  result = loglin(table(observed), cliques)
   deviance = result$lrt
-  noOfParam = nrow(data.frame(observed))  - result$df
-  
-  print(deviance)
-  
-  print(result$df)
-  print(noOfParam)
+  noOfParam = 2**nrow(model)  - result$df
   
   if(scoreType == "aic"){
     return (deviance + 2 * noOfParam)
     
   } else if (scoreType == "bic"){    
-    return (deviance + log(nrow(data.frame(observed)), exp(1)) * noOfParam)
+    return (deviance + log(nrow(observed), exp(1)) * noOfParam)
     
   } else {    
     return -1

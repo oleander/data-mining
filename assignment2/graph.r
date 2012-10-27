@@ -22,73 +22,48 @@ graph.init = matrix(c(
 ), 5, 5)
 
 gm.search = function(observed, graph.init, forward, backward, scoreType){
-  
-  
   score(graph.init, deviance)
-  
   hillClimb(observed, graph.init, forward, backward, scoreType)
-  
-  
   bestNeighbour = NULL
-
-    
-    bestScore = NULL
-    for (v1 in 1:nrow(observed)){
-      for (v2 in 1:(v1 - 1)){
-        evalModel = model  
-        if(model[vertex1, vertex2] == 1 && backward){
-          
-          evalModel[vertex1, vertex2] == 0
-          score(evalModel, )
-          
-        } else if (model[vertex1, vertex2] == 0 && forward){
-          evalModel[vertex1, vertex2] == 1
-          score(evalModel, )
-          
-        }
+  bestScore = NULL
+  for (v1 in 1:nrow(observed)){
+    for (v2 in 1:(v1 - 1)){
+      evalModel = model  
+      if(model[vertex1, vertex2] == 1 && backward){
+        
+        evalModel[vertex1, vertex2] == 0
+        score(evalModel, )
+        
+      } else if (model[vertex1, vertex2] == 0 && forward){
+        evalModel[vertex1, vertex2] == 1
+        score(evalModel, )
       }
     }
-    
-    
-  
-   
+  }
 }
 
 gm.hillClimb = function(scoreValue, model, forward, backward, scoreType  ){
-  
 }
 
-
-
-
-
 gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backward, score){
-  
 }
 
 gm.score = function(model, observed, scoreType){
   cliques = calcC(model)
   result = loglin(table(observed), cliques)
   deviance = result$lrt
-  noOfParam = 2**nrow(model)  - result$df
+  noOfParam = 2**nrow(model) - result$df
   
   if(scoreType == "aic"){
     return (deviance + 2 * noOfParam)
-    
-  } else if (scoreType == "bic"){    
+  } else if (scoreType == "bic"){
     return (deviance + log(nrow(observed), exp(1)) * noOfParam)
-    
   } else {    
     return -1
   }
-  
 }
 
-
-
-
 calcC = function(graph) {
-  
   # find neighbors of vertex v in graph
   neighbors = function(v) {
     which(graph[v,] == 1, arr.in=TRUE)
@@ -118,4 +93,3 @@ calcC = function(graph) {
   
   bk(P = 1:nrow(graph))
 }
-

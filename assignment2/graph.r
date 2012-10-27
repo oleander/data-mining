@@ -26,7 +26,7 @@ gm.search = function(observed, graph.init, forward, backward, scoreType){
   hillClimb(observed, graph.init, forward, backward, scoreType)
   bestNeighbour = NULL
   bestScore = NULL
-  for (v1 in 1:nrow(observed)){
+  for (v1 in 1:nrow(model)){
     for (v2 in 1:(v1 - 1)){
       evalModel = model  
       if(model[vertex1, vertex2] == 1 && backward){
@@ -40,6 +40,42 @@ gm.search = function(observed, graph.init, forward, backward, scoreType){
       }
     }
   }
+}
+
+gm.toggleV = function(model, i, j) {
+  if(model[i, j] == 1){
+    model[i, j] = 0
+    model[j, i] = 0
+  } else {
+    model[i, j] = 1
+    model[j, i] = 1
+  }
+
+  return(model)
+}
+
+gm.testing = function(model, observed, scoreType = "bic") {
+  bestScore = Inf
+  bestV1 = NULL
+  bestV2 = NULL
+  numberOfThings = ncol(model)
+
+  for (i in 1:numberOfThings) {
+    for (j in i:numberOfThings) {
+      model = gm.toggleV(model, i, j)
+
+      currentScore = gm.score(model, observed, scoreType)
+      if(currentScore < bestScore) {
+        bestScore = currentScore
+        bestV1 = i
+        bestV2 = j
+      }
+
+      model = gm.toggleV(model, i, j)
+    }
+  }
+
+  return(c(score = bestScore, v1 = bestV1, v2 = bestV2))
 }
 
 gm.hillClimb = function(scoreValue, model, forward, backward, scoreType){

@@ -42,14 +42,14 @@ gm.search = function(observed, graph.init, forward, backward, scoreType){
   }
 }
 
-gm.hillClimb = function(scoreValue, model, forward, backward, scoreType  ){
+gm.hillClimb = function(scoreValue, model, forward, backward, scoreType){
 }
 
 gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backward, score){
 }
 
 gm.score = function(model, observed, scoreType){
-  cliques = calcC(model)
+  cliques = gm.calcCliques(model)
   result = loglin(table(observed), cliques)
   deviance = result$lrt
   noOfParam = 2**nrow(model) - result$df
@@ -58,12 +58,12 @@ gm.score = function(model, observed, scoreType){
     return (deviance + 2 * noOfParam)
   } else if (scoreType == "bic"){
     return (deviance + log(nrow(observed), exp(1)) * noOfParam)
-  } else {    
+  } else {
     return -1
   }
 }
 
-calcC = function(graph) {
+gm.calcCliques = function(graph) {
   # find neighbors of vertex v in graph
   neighbors = function(v) {
     which(graph[v,] == 1, arr.in=TRUE)

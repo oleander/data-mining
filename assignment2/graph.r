@@ -25,18 +25,22 @@ gm.search = function(observed, graph.init, forward, backward, scoreType){
   model = graph.init
   score = Inf
   while(T) {
-    result = gm.findBestN(model, observed, scoreType)
-    if(result$score < score) {
+    result = gm.findBestN(model, observed, scoreType, forward, backward)
+    if(result$score < score){
+      score = result$score
+      # Model hasn't been changed
+      if(is.null(result$v1) || is.null(result$v2)){ break }
+
       newModelResult = gm.toggleV(model, result$v1, result$v2)
       model = newModelResult$model
       cat(sprintf("%s: %s - %s (score = %f)\n", newModelResult$what, result$v1, result$v2, result$score))
-      score = result$score
     } else {
-      cat(sprintf("\n\tTotal score %s\n\n", score))
-      print(model)
       break
     }
   }
+
+  cat(sprintf("\n\tTotal score %s\n\n", score))
+  print(model)
 }
 
 gm.toggleV = function(model, i, j) {
@@ -53,14 +57,17 @@ gm.toggleV = function(model, i, j) {
   return(list(model = model, what = what))
 }
 
-gm.findBestN = function(model, observed, scoreType = "bic") {
-  bestScore = Inf
+gm.findBestN = function(model, observed, scoreType, forward, backward) {
+  bestScore = gm.score(model, observed, scoreType)
   bestV1 = NULL
   bestV2 = NULL
   numberOfThings = ncol(model)
 
   for (i in 1:numberOfThings) {
     for (j in i:numberOfThings) {
+      if(model[i, j] == 1 && !backward){ next } 
+      if(model[i, j] == 0 && !forward){ next } 
+
       model = gm.toggleV(model, i, j)$model
 
       currentScore = gm.score(model, observed, scoreType)
@@ -73,7 +80,6 @@ gm.findBestN = function(model, observed, scoreType = "bic") {
       model = gm.toggleV(model, i, j)$model
     }
   }
-
   return(list(score = bestScore, v1 = bestV1, v2 = bestV2))
 }
 

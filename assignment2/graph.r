@@ -22,22 +22,19 @@ graph.init = matrix(c(
 ), 5, 5)
 
 gm.search = function(observed, graph.init, forward, backward, scoreType){
-  score(graph.init, deviance)
-  hillClimb(observed, graph.init, forward, backward, scoreType)
-  bestNeighbour = NULL
-  bestScore = NULL
-  for (v1 in 1:nrow(model)){
-    for (v2 in 1:(v1 - 1)){
-      evalModel = model  
-      if(model[vertex1, vertex2] == 1 && backward){
-        
-        evalModel[vertex1, vertex2] == 0
-        score(evalModel, )
-        
-      } else if (model[vertex1, vertex2] == 0 && forward){
-        evalModel[vertex1, vertex2] == 1
-        score(evalModel, )
-      }
+  model = graph.init
+  score = Inf
+  while(T) {
+    result = gm.findBestN(model, observed, scoreType)
+    if(result$score < score) {
+      newModelResult = gm.toggleV(model, result$v1, result$v2)
+      model = newModelResult$model
+      cat(sprintf("%s: %s - %s (score = %f)\n", newModelResult$what, result$v1, result$v2, result$score))
+      score = result$score
+    } else {
+      cat(sprintf("\n\tTotal score %s\n\n", score))
+      print(model)
+      break
     }
   }
 }
@@ -46,15 +43,17 @@ gm.toggleV = function(model, i, j) {
   if(model[i, j] == 1){
     model[i, j] = 0
     model[j, i] = 0
+    what = "Removed"
   } else {
     model[i, j] = 1
     model[j, i] = 1
+    what = "Added"
   }
 
-  return(model)
+  return(list(model = model, what = what))
 }
 
-gm.testing = function(model, observed, scoreType = "bic") {
+gm.findBestN = function(model, observed, scoreType = "bic") {
   bestScore = Inf
   bestV1 = NULL
   bestV2 = NULL
@@ -62,7 +61,7 @@ gm.testing = function(model, observed, scoreType = "bic") {
 
   for (i in 1:numberOfThings) {
     for (j in i:numberOfThings) {
-      model = gm.toggleV(model, i, j)
+      model = gm.toggleV(model, i, j)$model
 
       currentScore = gm.score(model, observed, scoreType)
       if(currentScore < bestScore) {
@@ -71,11 +70,11 @@ gm.testing = function(model, observed, scoreType = "bic") {
         bestV2 = j
       }
 
-      model = gm.toggleV(model, i, j)
+      model = gm.toggleV(model, i, j)$model
     }
   }
 
-  return(c(score = bestScore, v1 = bestV1, v2 = bestV2))
+  return(list(score = bestScore, v1 = bestV1, v2 = bestV2))
 }
 
 gm.hillClimb = function(scoreValue, model, forward, backward, scoreType){
@@ -86,7 +85,7 @@ gm.restart = function(nstart, prob, seed, observed, graph.init, forward, backwar
 
 gm.score = function(model, observed, scoreType){
   cliques = gm.calcCliques(model)
-  result = loglin(table(observed), cliques)
+  result = loglin(table(observed), cliques, print = F)
   deviance = result$lrt
   noOfParam = 2**nrow(model) - result$df
   

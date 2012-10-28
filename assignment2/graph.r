@@ -101,10 +101,10 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
 }
 
 
-gm.restart = function(nstart, prob, observed, forward, backward, scoreType){
-#   if(seed != NULL){
-#     set.seed(seed)
-#   }
+gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType){
+  if(!missing(seed)){
+    set.seed(seed)
+  }
   
   bestScore = Inf
   bestModel = NULL

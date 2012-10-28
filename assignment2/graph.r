@@ -57,6 +57,20 @@ gm.toggleV = function(model, i, j) {
   return(list(model = model, what = what))
 }
 
+gm.createRandomMatrix = function(size, prob){
+  
+  mat = matrix(0, size, size)
+  
+  for (i in 1:(size - 1)){    
+    for (j in (i + 1):size){
+      mat[i,j] = rbinom(1, 1, prob)
+      mat[j,i] = mat[i,j]      
+    }
+  }
+       
+  return(mat) 
+}
+
 gm.findBestN = function(model, observed, scoreType, forward, backward) {
   bestScore = gm.score(model, observed, scoreType)
   bestV1 = NULL

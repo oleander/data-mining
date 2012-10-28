@@ -64,11 +64,17 @@ gm.createRandomMatrix = function(size, prob){
   
   mat = matrix(0, size, size)
   
-  for (i in 1:(size - 1)){    
-    for (j in (i + 1):size){
-      mat[i,j] = rbinom(1, 1, prob)
-      mat[j,i] = mat[i,j]      
-    }
+#   for (i in 1:(size - 1)){    
+#     for (j in (i + 1):size){
+#       mat[i,j] = rbinom(1, 1, prob)
+#       mat[j,i] = mat[i,j]      
+#     }
+#   }
+  
+  for (i in 1:(size - 1)){
+    j = i + 1
+    mat[i,j:size] = rbinom(size - i, 1, prob)
+    mat[j:size,i] = mat[i,j:size]    
   }
        
   return(mat) 

@@ -39,8 +39,9 @@ gm.search = function(observed, graph.init, forward, backward, scoreType){
     }
   }
 
-  cat(sprintf("\n\tTotal score %s\n\n", score))
+  cat(sprintf("\n\tTotal score %s\n\n", score))  
   print(model)
+  cat(sprintf("----------------------------------------\n\n"))
   
   return(list(model = gm.calcCliques(model), score = score, call = match.call())) 
 }
@@ -99,8 +100,6 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
   return(list(score = bestScore, v1 = bestV1, v2 = bestV2))
 }
 
-gm.hillClimb = function(scoreValue, model, forward, backward, scoreType){
-}
 
 gm.restart = function(nstart, prob, observed, forward, backward, scoreType){
 #   if(seed != NULL){
@@ -108,7 +107,7 @@ gm.restart = function(nstart, prob, observed, forward, backward, scoreType){
 #   }
   
   bestScore = Inf
-  cliques = NULL
+  bestModel = NULL
   
   for (i in 1:nstart){
     graph = gm.createRandomMatrix(ncol(observed), prob)
@@ -116,11 +115,11 @@ gm.restart = function(nstart, prob, observed, forward, backward, scoreType){
     
     if(result$score < bestScore){
       bestScore = result$score
-      cliques = result$cliques
+      bestModel = result$model
     }
   }
   
-  return(list(model = result$model, score = result$score, call = match.call()))
+  return(list(model = bestModel, score = bestScore, call = match.call()))
 }
 
 gm.score = function(model, observed, scoreType){

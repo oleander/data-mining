@@ -21,7 +21,7 @@ graph.init = matrix(c(
   0,1,1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,0
 ), 5, 5)
 
-gm.search = function(observed, graph.init, forward, backward, scoreType){
+gm.search = function(observed, graph.init, forward = T, backward = T, scoreType){
   model = graph.init
   score = Inf
   while(T) {
@@ -112,11 +112,13 @@ gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType
     set.seed(seed)
   }
   
+  size = summary(observed)$n.vars
+  
   bestScore = Inf
   bestModel = NULL
   
   for (i in 1:nstart){
-    graph = gm.createRandomMatrix(ncol(observed), prob)
+    graph = gm.createRandomMatrix(size, prob)
     result = gm.search(observed, graph, forward, backward, scoreType)
     
     if(result$score < bestScore){
@@ -130,14 +132,15 @@ gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType
 
 gm.score = function(model, observed, scoreType){
   cliques = gm.calcCliques(model)
-  result = loglin(table(observed), cliques, print = F)
+  result = loglin(observed, cliques, print = F)
   deviance = result$lrt
+  noOfCases = summary(observed)$n.cases
   noOfParam = 2**nrow(model) - result$df
   
   if(scoreType == "aic"){
     return (deviance + 2 * noOfParam)
   } else if (scoreType == "bic"){
-    return (deviance + log(nrow(observed), exp(1)) * noOfParam)
+    return (deviance + log(noOfCases, exp(1)) * noOfParam)
   } else {
     return -1
   }

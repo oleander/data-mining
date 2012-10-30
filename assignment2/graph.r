@@ -168,7 +168,7 @@ gm.calcCliques = function(graph) {
     u = union(P, X)[1]
     for (v in setdiff(P, neighbors(u))) {
       cliques = c(cliques, bk(union(R, v), intersect(P, neighbors(v)), intersect(X, neighbors(v))))
-      P = P[-1]
+      P = setdiff(P, c(v)) # P[-1]
       X = union(X, v)
     }
     return(cliques)

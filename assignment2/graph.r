@@ -34,12 +34,18 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
       break
     }
   }
+  
+  cliques = gm.calcCliques(model)
 
   cat(sprintf("\n\tTotal score %s\n\n", score))  
   print(model)
   cat(sprintf("----------------------------------------\n\n"))
+  cat("\n\tCliques:\n\n")
+  for( c in cliques) {
+    cat(sprintf("%s\n", paste(c, collapse = " - ")))
+  }
   
-  return(list(model = gm.calcCliques(model), score = score, call = match.call())) 
+  return(list(model = cliques, score = score, call = match.call(), graph = model)) 
 }
 
 #
@@ -221,4 +227,14 @@ gm.calcCliques = function(graph) {
   }
   
   bk(P = 1:nrow(graph))
+}
+
+gm.dot = function(matrix) {
+  for (i in 1:(nrow(matrix) - 1)) {
+    for (j in (i+1):(nrow(matrix))) {
+      if (matrix[i,j] == 1) {
+        cat(sprintf("%s -- %s;\n", i, j))
+      }
+    }
+  }
 }

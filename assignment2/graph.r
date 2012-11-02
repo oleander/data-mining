@@ -1,3 +1,13 @@
+#
+# @observed Table Observed data
+# @graph.init List<List<Integer>> A matrix representing the graph
+# @forward Boolean (Optional) Are we allowed to add edges?
+# @backward Boolean (Optional) Are we allowed to remove edges?
+# @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
+# @return$model List<List<Integer>> A list containing the cliques of the final model
+# @return$score Float The AIC or BIC score of the final model
+# @return$call The call to the function gm.search that produced this result
+#
 gm.search = function(observed, graph.init, forward = T, backward = T, scoreType){
   model = graph.init
   score = Inf
@@ -16,7 +26,7 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
       } else {
         what = "Removed"
       }
-      
+
       cat(sprintf("%s: %s - %s (score = %f)\n", what, result$v1, result$v2, result$score))
     } else {
       break
@@ -36,11 +46,10 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
 # @model List<List<Integer>> A matrix representing the graph
 # @i Integer Coordinate
 # @j Integer Coordinate
-# @return
-#   model List<List<Integer>> Model with (i, j) and (j, i) toggled
-#   what Integer
-#     == 1 An edge was added
-#     == 0 An edge was removed
+# @return$model List<List<Integer>> Model with (i, j) and (j, i) toggled
+# @return$what Integer
+#   == 1 An edge was added
+#   == 0 An edge was removed
 #
 gm.toggleV = function(model, i, j) {
   if(model[i, j] == 1){
@@ -82,9 +91,8 @@ gm.createRandomMatrix = function(size, prob){
 # @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
 # @forward Boolean Are we allowed to add edges?
 # @backward Boolean Are we allowed to remove edges?
-# @return
-#   @score Float Score for the given @model with new node @return$v1, @return$v2
-#   @v1, @v2 Integer<0,1> New node in @model
+# @return$score Float Score for the given @model with new node @return$v1, @return$v2
+# @return$v1, @return$v2 Integer<0,1> New node in @model
 #
 gm.findBestN = function(model, observed, scoreType, forward, backward) {
   bestScore = gm.score(model, observed, scoreType)
@@ -122,10 +130,9 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
 # @forward Boolean Are we allowed to add edges?
 # @backward Boolean Are we allowed to remove edges?
 # @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
-# @return 
-#   model List<List<Integer>> Best found model
-#   score Float Score for the given model
-#   call the call to the function gm.search that produced this result. 
+# @return$model List<List<Integer>> Best found model
+# @return$score Float Score for the given model
+# @return$call the call to the function gm.search that produced this result. 
 #
 gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType){
   if(!missing(seed)){
@@ -156,6 +163,7 @@ gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType
 # @model List<List<Integer>> A matrix representing the graph
 # @observed Table Observed data to base the score on
 # @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
+# @return Float The AIC or BIC score of the @model
 #
 gm.score = function(model, observed, scoreType){
   if(scoreType != "aic" && scoreType != "bic"){
@@ -180,7 +188,7 @@ gm.score = function(model, observed, scoreType){
 # It uses the BronKerbosch2 algorithm with pivot from Wikipedia
 #
 # @graph List<List<Integer>> A Graph
-# @return P = List<List<Integer>> A list of cliques
+# @return$P List<List<Integer>> A list of cliques
 #
 gm.calcCliques = function(graph) {
   # find neighbors of vertex v in graph

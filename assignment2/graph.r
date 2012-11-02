@@ -142,7 +142,7 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
 # @return$score Float Score for the given model
 # @return$call the call to the function gm.search that produced this result. 
 #
-gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType){
+gm.restart = function(nstart, prob, seed, observed, forward = T, backward = T, scoreType){
   if(!missing(seed)){
     set.seed(seed)
   }

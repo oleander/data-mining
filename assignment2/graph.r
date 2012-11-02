@@ -10,7 +10,14 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
 
       newModelResult = gm.toggleV(model, result$v1, result$v2)
       model = newModelResult$model
-      cat(sprintf("%s: %s - %s (score = %f)\n", newModelResult$what, result$v1, result$v2, result$score))
+      what = newModelResult$what
+      if(newModelResult$what == 1){
+        what = "Added"
+      } else {
+        what = "Removed"
+      }
+      
+      cat(sprintf("%s: %s - %s (score = %f)\n", what, result$v1, result$v2, result$score))
     } else {
       break
     }
@@ -23,31 +30,41 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
   return(list(model = gm.calcCliques(model), score = score, call = match.call())) 
 }
 
+#
+# Toggles (i, j) and (j, i) in @model
+#
+# @model List<List<Integer>> A matrix representing the graph
+# @i Integer Coordinate
+# @j Integer Coordinate
+# @return
+#   model List<List<Integer>> Model with (i, j) and (j, i) toggled
+#   what Integer
+#     == 1 An edge was added
+#     == 0 An edge was removed
+#
 gm.toggleV = function(model, i, j) {
   if(model[i, j] == 1){
     model[i, j] = 0
     model[j, i] = 0
-    what = "Removed"
+    what = 0 # Removed
   } else {
     model[i, j] = 1
     model[j, i] = 1
-    what = "Added"
+    what = 1 # Added
   }
 
   return(list(model = model, what = what))
 }
 
+#
+# Creates a random matrix with the given dimensions 
+#
+# @size Integer Height and width of matrix
+# @prob Float Specifies the probability of an edge between any pair of nodes
+# @return List<List<Integer>> A newly generated matrix
+#
 gm.createRandomMatrix = function(size, prob){
-  
   mat = matrix(0, size, size)
-  
-#   for (i in 1:(size - 1)){    
-#     for (j in (i + 1):size){
-#       mat[i,j] = rbinom(1, 1, prob)
-#       mat[j,i] = mat[i,j]      
-#     }
-#   }
-  
   for (i in 1:(size - 1)){
     j = i + 1
     mat[i,j:size] = rbinom(size - i, 1, prob)
@@ -99,16 +116,16 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
 # Use random restarts from diffrent initial models
 #
 # @nstart Integer The number of restarts to be performed
-# @prob Float specifies the probability of an edge between any pair of nodes
+# @prob Float Specifies the probability of an edge between any pair of nodes
 # @seed Integer (Optional) A random seed so the results can be reproduced
 # @observed Table Observed data
 # @forward Boolean Are we allowed to add edges?
 # @backward Boolean Are we allowed to remove edges?
 # @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
 # @return 
-#   model = List<List<Integer>> Best found model
-#   score = Float Score for the given model
-#   call = the call to the function gm.search that produced this result. 
+#   model List<List<Integer>> Best found model
+#   score Float Score for the given model
+#   call the call to the function gm.search that produced this result. 
 #
 gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType){
   if(!missing(seed)){
@@ -153,7 +170,7 @@ gm.score = function(model, observed, scoreType){
   
   if(scoreType == "aic"){
     return (deviance + 2 * noOfParam)
-  } else (scoreType == "bic"){
+  } else {
     return (deviance + log(noOfCases, exp(1)) * noOfParam)
   }
 }

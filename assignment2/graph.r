@@ -132,7 +132,7 @@ gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType
 
 gm.score = function(model, observed, scoreType){
   cliques = gm.calcCliques(model)
-  result = loglin(observed, cliques, print = F)
+  result = loglin(observed, cliques, print = F, iter = 40)
   deviance = result$lrt
   noOfCases = summary(observed)$n.cases
   noOfParam = 2**nrow(model) - result$df

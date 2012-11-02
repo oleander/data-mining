@@ -1,26 +1,3 @@
-#      [,1] [,2] [,3] [,4]
-# [1,]    0    1    1    0
-# [2,]    1    0    1    0
-# [3,]    1    1    0    1
-# [4,]    0    0    1    0
-
-# graph.init = matrix(c(
-#   0,1,1,0,
-#   1,0,1,0,
-#   1,1,0,1,
-#   0,0,1,0
-# ), 4, 4)
-
-#      [,1] [,2] [,3] [,4] [,5]
-# [1,]    0    1    1    0    1
-# [2,]    1    0    0    1    0
-# [3,]    1    0    0    1    1
-# [4,]    0    1    1    0    0
-# [5,]    1    0    1    0    0
-graph.init = matrix(c(
-  0,1,1,0,1,1,0,0,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,0,0
-), 5, 5)
-
 gm.search = function(observed, graph.init, forward = T, backward = T, scoreType){
   model = graph.init
   score = Inf
@@ -107,6 +84,21 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
 }
 
 
+#
+# Use random restarts from diffrent initial models
+#
+# @nstart Integer The number of restarts to be performed
+# @prob Float specifies the probability of an edge between any pair of nodes
+# @seed Integer (Optional) A random seed so the results can be reproduced
+# @observed Table Observed data
+# @forward Boolean Are we allowed to add edges?
+# @backward Boolean Are we allowed to remove edges?
+# @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
+# @return 
+#   model = List<List<Integer>> Best found model
+#   score = Float Score for the given model
+#   call = the call to the function gm.search that produced this result. 
+#
 gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType){
   if(!missing(seed)){
     set.seed(seed)
@@ -130,7 +122,18 @@ gm.restart = function(nstart, prob, seed, observed, forward, backward, scoreType
   return(list(model = bestModel, score = bestScore, call = match.call()))
 }
 
+#
+# Calculates the score for a given @model
+#
+# @model List<List<Integer>> A matrix representing the graph
+# @observed Table Observed data to base the score on
+# @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
+#
 gm.score = function(model, observed, scoreType){
+  if(scoreType != "aic" && scoreType != "bic"){
+    stop("scoreType must equal 'aic' or 'bic'")
+  }
+
   cliques = gm.calcCliques(model)
   result = loglin(observed, cliques, print = F, iter = 40)
   deviance = result$lrt
@@ -139,20 +142,25 @@ gm.score = function(model, observed, scoreType){
   
   if(scoreType == "aic"){
     return (deviance + 2 * noOfParam)
-  } else if (scoreType == "bic"){
+  } else (scoreType == "bic"){
     return (deviance + log(noOfCases, exp(1)) * noOfParam)
-  } else {
-    return -1
   }
 }
 
+#
+# Generates a list of cliques based on ingoing @graph
+# It uses the BronKerbosch2 algorithm with pivot from Wikipedia
+#
+# @graph List<List<Integer>> A Graph
+# @return P = List<List<Integer>> A list of cliques
+#
 gm.calcCliques = function(graph) {
   # find neighbors of vertex v in graph
   neighbors = function(v) {
     which(graph[v,] == 1, arr.in=TRUE)
   }
   
-  # BronKerbosch1(R,P,X):
+  # BronKerbosch2 (R,P,X):
   #     if P and X are both empty:
   #         report R as a maximal clique
   #     choose a pivot vertex u in P ⋃ X

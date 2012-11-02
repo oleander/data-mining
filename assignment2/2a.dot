@@ -1,0 +1,25 @@
+graph graphname {
+
+  1 -- 3 -- 7;
+  1 -- 7;
+  
+  1 -- 4;
+  1 -- 8;
+  2 -- 5;
+  2 -- 6;
+  5 -- 3;
+  5 -- 4;
+  6 -- 4;
+  6 -- 7;
+  6 -- 8;
+
+  1 [label=AgeGroup]
+  2 [label=Race]
+  3 [label=Completed]
+  4 [label=InsuranceType]
+  5 [label=MedAssist]
+  6 [label=Location]
+  7 [label=LocationType]
+  8 [label=PracticeType]
+
+}

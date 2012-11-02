@@ -100,8 +100,8 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
   bestV2 = NULL
   numberOfThings = ncol(model)
 
-  for (i in 1:numberOfThings) {
-    for (j in i:numberOfThings) {
+  for (i in 1:(numberOfThings - 1)) {
+    for (j in (i + 1):numberOfThings) {
       if(model[i, j] == 1 && !backward){ next } 
       if(model[i, j] == 0 && !forward){ next } 
 

@@ -1,4 +1,6 @@
 #
+# Creates the best possible model (cliques) based on ingoing arguments
+#
 # @observed Table Observed data
 # @graph.init List<List<Integer>> A matrix representing the graph
 # @forward Boolean (Optional) Are we allowed to add edges?

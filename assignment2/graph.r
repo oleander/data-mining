@@ -20,7 +20,7 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
       # Model hasn't been changed
       if(is.null(result$v1) || is.null(result$v2)){ break }
 
-      newModelResult = gm.toggleV(model, result$v1, result$v2)
+      newModelResult = gm.toggleEdge(model, result$v1, result$v2)
       model = newModelResult$model
       what = newModelResult$what
       if(newModelResult$what == 1){
@@ -39,13 +39,50 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
 
   cat(sprintf("\n\tTotal score %s\n\n", score))  
   print(model)
-  cat(sprintf("----------------------------------------\n\n"))
   cat("\n\tCliques:\n\n")
   for( c in cliques) {
     cat(sprintf("%s\n", paste(c, collapse = " - ")))
   }
+  cat(sprintf("\n----------------------------------------\n\n"))
   
   return(list(model = cliques, score = score, call = match.call(), graph = model)) 
+}
+
+#
+# Use random restarts from diffrent initial models
+#
+# @nstart Integer The number of restarts to be performed
+# @prob Float Specifies the probability of an edge between any pair of nodes
+# @seed Integer (Optional) A random seed so the results can be reproduced
+# @observed Table Observed data
+# @forward Boolean Are we allowed to add edges?
+# @backward Boolean Are we allowed to remove edges?
+# @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
+# @return$model List<List<Integer>> Best found model
+# @return$score Float Score for the given model
+# @return$call the call to the function gm.search that produced this result. 
+#
+gm.restart = function(nstart, prob, seed, observed, forward = T, backward = T, scoreType){
+  if(!missing(seed)){
+    set.seed(seed)
+  }
+  
+  size = summary(observed)$n.vars
+  
+  bestScore = Inf
+  bestModel = NULL
+  
+  for (i in 1:nstart){
+    graph = gm.createRandomMatrix(size, prob)
+    result = gm.search(observed, graph, forward, backward, scoreType)
+    
+    if(result$score < bestScore){
+      bestScore = result$score
+      bestModel = result$model
+    }
+  }
+  
+  return(list(model = bestModel, score = bestScore, call = match.call()))
 }
 
 #
@@ -59,7 +96,7 @@ gm.search = function(observed, graph.init, forward = T, backward = T, scoreType)
 #   == 1 An edge was added
 #   == 0 An edge was removed
 #
-gm.toggleV = function(model, i, j) {
+gm.toggleEdge = function(model, i, j) {
   if(model[i, j] == 1){
     model[i, j] = 0
     model[j, i] = 0
@@ -113,7 +150,7 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
       if(model[i, j] == 1 && !backward){ next } 
       if(model[i, j] == 0 && !forward){ next } 
 
-      model = gm.toggleV(model, i, j)$model
+      model = gm.toggleEdge(model, i, j)$model
 
       currentScore = gm.score(model, observed, scoreType)
       if(currentScore < bestScore) {
@@ -122,47 +159,10 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
         bestV2 = j
       }
 
-      model = gm.toggleV(model, i, j)$model
+      model = gm.toggleEdge(model, i, j)$model
     }
   }
   return(list(score = bestScore, v1 = bestV1, v2 = bestV2))
-}
-
-#
-# Use random restarts from diffrent initial models
-#
-# @nstart Integer The number of restarts to be performed
-# @prob Float Specifies the probability of an edge between any pair of nodes
-# @seed Integer (Optional) A random seed so the results can be reproduced
-# @observed Table Observed data
-# @forward Boolean Are we allowed to add edges?
-# @backward Boolean Are we allowed to remove edges?
-# @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
-# @return$model List<List<Integer>> Best found model
-# @return$score Float Score for the given model
-# @return$call the call to the function gm.search that produced this result. 
-#
-gm.restart = function(nstart, prob, seed, observed, forward = T, backward = T, scoreType){
-  if(!missing(seed)){
-    set.seed(seed)
-  }
-  
-  size = summary(observed)$n.vars
-  
-  bestScore = Inf
-  bestModel = NULL
-  
-  for (i in 1:nstart){
-    graph = gm.createRandomMatrix(size, prob)
-    result = gm.search(observed, graph, forward, backward, scoreType)
-    
-    if(result$score < bestScore){
-      bestScore = result$score
-      bestModel = result$model
-    }
-  }
-  
-  return(list(model = bestModel, score = bestScore, call = match.call()))
 }
 
 #

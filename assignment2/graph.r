@@ -57,6 +57,18 @@ gm.createRandomMatrix = function(size, prob){
   return(mat) 
 }
 
+#
+# What changes should be made to @model based on @observed to get the best score?
+#
+# @model List<List<Integer>> A matrix representing the graph
+# @observed Table Observed data
+# @scoreType String<"bic", "aic"> What algorithm should be used to calculate the score?
+# @forward Boolean Are we allowed to add edges?
+# @backward Boolean Are we allowed to remove edges?
+# @return
+#   @score Float Score for the given @model with new node @return$v1, @return$v2
+#   @v1, @v2 Integer<0,1> New node in @model
+#
 gm.findBestN = function(model, observed, scoreType, forward, backward) {
   bestScore = gm.score(model, observed, scoreType)
   bestV1 = NULL
@@ -82,7 +94,6 @@ gm.findBestN = function(model, observed, scoreType, forward, backward) {
   }
   return(list(score = bestScore, v1 = bestV1, v2 = bestV2))
 }
-
 
 #
 # Use random restarts from diffrent initial models
